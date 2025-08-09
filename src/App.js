@@ -100,7 +100,7 @@ const experiences = [
     duration: "August 2025 - Present",
     location: "SKIT Jaipur (Onsite)",
     points: [
-      "Currently mentoring students in Data Structures and Algorithms.",
+      "Currently teaching and mentoring students in Data Structures and Algorithms.",
       "Assisting in doubt resolution and providing guidance on competitive programming concepts.",
       "Contributing to the learning experience of aspiring developers.",
     ],
@@ -153,7 +153,7 @@ const achievements = [
   },
   {
     platform: "LeetCode",
-    rank: "Knight (Top 3.7%) ",
+    rank: "Knight (Top 2.3%) ",
     link: "http://leetcode.com/u/ambrosedean351",
     icon: <Code className="w-5 h-5 text-orange-400" />,
   },
