@@ -3,10 +3,9 @@
 Welcome to my interactive portfolio, designed to look and feel like the Zorin OS desktop environment. This project is more than just a list of my skills and experiences; it's a fully functional, web-based operating system that you can explore.
 
 **[➡️ View the Live Demo Here](https://shashank-tomar.vercel.app/)** 
-*(Replace this with your actual Vercel deployment URL)*
 
- 
-*(To add a screenshot: take a picture of your deployed portfolio, upload it to a site like Imgur, and replace the URL above with your new image link.)*
+ <img width="1366" height="639" alt="image" src="https://github.com/user-attachments/assets/a2aa8a2b-9340-4e79-9dba-29d68bb04211" />
+
 
 ## ✨ Core Features
 
