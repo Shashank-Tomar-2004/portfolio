@@ -1,18 +1,19 @@
 /*
  * =================================================================
- * FILE: App.js (Zorin OS Portfolio) - STAGE 5: MOBILE RESPONSIVENESS
+ * FILE: App.js (Zorin OS Portfolio) - STAGE 6: FINAL MOBILE POLISH
  * =================================================================
  *
- * This version introduces responsive design to ensure a great user
- * experience on mobile devices.
+ * This version implements the final user feedback for a polished
+ * and intuitive mobile experience.
  *
  * Key Upgrades:
- * - MOBILE DETECTION: A new `useMediaQuery` hook detects small screens.
- * - FULL-SCREEN APPS: On mobile, all apps open in a maximized, full-
- *   screen view for better usability.
- * - RESPONSIVE LAYOUT: The taskbar and desktop icons now adapt their
- *   layout to fit on narrow screens, preventing overflow.
- * - All previous features and security measures are maintained.
+ * - TRUE FULL-SCREEN APPS: 'About Me' and 'VS Code' now use a
+ *   single-column layout on mobile, making them truly full-screen.
+ * - TASKBAR VISIBILITY: The layout is fixed to prevent the taskbar
+ *   from being hidden on mobile, removing the need to scroll.
+ * - REFINED MOBILE UI: The mobile taskbar now mirrors the desktop's
+ *   floating design. An 'All Apps' icon now appears on the desktop
+ *   specifically for mobile users.
  *
  * =================================================================
  */
@@ -117,7 +118,7 @@ const experiences = [
     duration: "August 2025 - Present",
     location: "SKIT Jaipur (Onsite)",
     points: [
-      "Currently teaching and mentoring students in Data Structures and Algorithms.",
+      "Currently mentoring students in Data Structures and Algorithms.",
       "Assisting in doubt resolution and providing guidance on competitive programming concepts.",
       "Contributing to the learning experience of aspiring developers.",
     ],
@@ -170,7 +171,7 @@ const achievements = [
   },
   {
     platform: "LeetCode",
-    rank: "Knight (Top 2.3%) ",
+    rank: "Knight (Top 3.7%) ",
     link: "http://leetcode.com/u/ambrosedean351",
     icon: <Code className="w-5 h-5 text-orange-400" />,
   },
@@ -442,6 +443,7 @@ const ExperienceSection = () => (
     </div>{" "}
   </div>
 );
+
 const AboutApp = () => {
   const [activeSection, setActiveSection] = useState("about");
   const sections = {
@@ -465,32 +467,30 @@ const AboutApp = () => {
   };
   const ActiveComponent = sections[activeSection].component;
   return (
-    <div className="flex h-full bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
-      {" "}
-      <div className="w-56 bg-gray-100 dark:bg-gray-900 p-4 border-r dark:border-gray-700 flex-col hidden md:flex">
-        {" "}
+    <div className="flex flex-col md:flex-row h-full bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+      <div className="w-full md:w-56 bg-gray-100 dark:bg-gray-900 p-2 md:p-4 border-b md:border-b-0 md:border-r dark:border-gray-700 flex flex-row md:flex-col overflow-x-auto">
         {Object.entries(sections).map(([key, { label, icon: Icon }]) => (
           <button
             key={key}
             onClick={() => setActiveSection(key)}
-            className={`flex items-center gap-3 w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
+            className={`flex-shrink-0 flex items-center gap-3 w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
               activeSection === key
                 ? "bg-indigo-500 text-white"
                 : "hover:bg-gray-200 dark:hover:bg-gray-700/50"
             }`}
           >
-            {" "}
-            <Icon className="w-4 h-4" /> {label}{" "}
+            <Icon className="w-4 h-4" />
+            <span className="hidden md:inline">{label}</span>
           </button>
-        ))}{" "}
-      </div>{" "}
+        ))}
+      </div>
       <div className="flex-1 overflow-y-auto">
-        {" "}
-        <ActiveComponent />{" "}
-      </div>{" "}
+        <ActiveComponent />
+      </div>
     </div>
   );
 };
+
 const AICounselorApp = () => {
   const [messages, setMessages] = useState([
     {
@@ -722,7 +722,7 @@ const VSCodeApp = () => {
         </div>
         <div className="flex-grow flex flex-col">
           <div className="bg-[#252526] flex-shrink-0">
-            <div className="bg-[#37373d] inline-flex items-center px-4 py-2 md:border-t-2 border-blue-500">
+            <div className="bg-[#37373d] inline-flex items-center px-4 py-2 w-full md:w-auto border-t-2 border-blue-500">
               <File className="w-4 h-4 text-blue-400 mr-2" /> {activeFile}
             </div>
           </div>
@@ -945,7 +945,7 @@ const ContactApp = () => (
 );
 
 // =================================================================
-// MAIN OS COMPONENTS (Updated for Responsiveness)
+// MAIN OS COMPONENTS
 // =================================================================
 const ZorinIcon = (props) => (
   <svg
@@ -1093,9 +1093,8 @@ const Window = ({
       default: "w-[800px] h-[600px]",
     }[app.id] || "w-[800px] h-[600px]";
 
-  // On mobile, all windows are fullscreen. On desktop, they are either maximized or use their default size.
   const windowClasses = isActuallyMaximized
-    ? "top-0 left-0 w-full h-full md:h-[calc(100%-3.5rem)] rounded-none"
+    ? "top-0 left-0 w-full h-[calc(100%-3.5rem)] rounded-none"
     : `${windowSize} rounded-lg`;
 
   return (
@@ -1188,7 +1187,8 @@ const DesktopIcon = ({ app, onOpen }) => (
     <span className="drop-shadow-lg text-center">{app.name}</span>{" "}
   </button>
 );
-const Taskbar = ({ openApps, onFocus, onLock, onShowApps, isMobile }) => {
+
+const Taskbar = ({ openApps, onFocus, onLock }) => {
   const [time, setTime] = useState(new Date());
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -1198,34 +1198,22 @@ const Taskbar = ({ openApps, onFocus, onLock, onShowApps, isMobile }) => {
     ["chrome", "vscode", "terminal", "about", "settings"].includes(app.id)
   );
   return (
-    <div className="absolute bottom-0 md:bottom-2 left-0 md:left-1/2 md:-translate-x-1/2 w-full md:w-auto h-14 bg-gray-800/50 dark:bg-gray-900/50 backdrop-blur-xl md:rounded-2xl flex items-center justify-between px-2 md:px-3 shadow-lg border-t md:border-t-0 border-black/10 dark:border-white/10 text-white">
-      {" "}
+    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-auto h-14 bg-gray-800/50 dark:bg-gray-900/50 backdrop-blur-xl rounded-2xl flex items-center justify-between px-3 shadow-lg border-black/10 dark:border-white/10 text-white">
       <div className="flex items-center gap-1">
-        {" "}
         <button
-          onClick={onShowApps}
+          onClick={() => onLock(true)}
           className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10"
         >
-          <LayoutGrid className="w-5 h-5" />
-        </button>{" "}
-        {!isMobile && (
-          <button
-            onClick={() => onLock(true)}
-            className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10"
-          >
-            <Power className="w-5 h-5 text-blue-400" />
-          </button>
-        )}{" "}
-      </div>{" "}
-      <div className="flex-1 flex justify-center items-center gap-1 overflow-x-auto mx-2">
-        {" "}
+          <Power className="w-5 h-5 text-blue-400" />
+        </button>
+      </div>
+      <div className="flex items-center gap-1">
         {taskbarApps.map((app) => (
           <button
             key={app.id}
             onClick={() => onFocus(app.id)}
             className="w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-full hover:bg-white/10 relative p-1"
           >
-            {" "}
             {typeof app.icon === "string" ? (
               <img
                 src={app.icon}
@@ -1234,32 +1222,27 @@ const Taskbar = ({ openApps, onFocus, onLock, onShowApps, isMobile }) => {
               />
             ) : (
               <app.icon className="w-6 h-6" />
-            )}{" "}
+            )}
             {openApps.some(
               (openApp) => openApp.id === app.id && !openApp.isMinimized
             ) && (
               <span className="absolute bottom-0 w-1 h-1 bg-blue-500 rounded-full"></span>
-            )}{" "}
+            )}
           </button>
-        ))}{" "}
-      </div>{" "}
-      <div className="hidden md:flex items-center gap-3 text-xs px-3 py-1 bg-black/20 rounded-lg">
-        {" "}
-        <Wifi className="w-4 h-4" /> <Volume2 className="w-4 h-4" />{" "}
-        <Battery className="w-4 h-4" />{" "}
+        ))}
+      </div>
+      <div className="flex items-center gap-3 text-xs px-3 py-1 bg-black/20 rounded-lg">
+        <Wifi className="w-4 h-4" />
+        <Volume2 className="w-4 h-4" />
+        <Battery className="w-4 h-4" />
         <span>
           {time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-        </span>{" "}
-      </div>{" "}
-      <div className="text-xs font-semibold md:hidden">
-        {" "}
-        <span>
-          {time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-        </span>{" "}
-      </div>{" "}
+        </span>
+      </div>
     </div>
   );
 };
+
 const LockScreen = ({ onUnlock, theme }) => (
   <div
     onClick={onUnlock}
@@ -1380,21 +1363,28 @@ export default function App() {
       {isLocked && !openApps.length && (
         <LockScreen onUnlock={handleUnlock} theme={theme} />
       )}
-      <div className="relative z-10 h-full w-full">
-        {showAllApps && (
-          <AllAppsGrid
-            onOpen={openOrFocusApp}
-            onClose={() => setShowAllApps(false)}
-          />
-        )}
-        {!isMobile && (
-          <div className="p-4 h-full flex flex-col flex-wrap content-start gap-y-2">
-            {" "}
+
+      <div className="relative z-10 h-full w-full flex flex-col">
+        <main className="flex-grow p-4 h-[calc(100%-3.5rem)]">
+          {showAllApps && (
+            <AllAppsGrid
+              onOpen={openOrFocusApp}
+              onClose={() => setShowAllApps(false)}
+            />
+          )}
+          <div className="h-full flex flex-col flex-wrap content-start gap-y-2">
             {apps.map((app) => (
               <DesktopIcon key={app.id} app={app} onOpen={openOrFocusApp} />
-            ))}{" "}
+            ))}
+            {isMobile && (
+              <DesktopIcon
+                app={{ id: "all_apps", name: "All Apps", icon: LayoutGrid }}
+                onOpen={() => setShowAllApps(true)}
+              />
+            )}
           </div>
-        )}
+        </main>
+
         {openApps.map((app) => (
           <Window
             key={app.id}
@@ -1408,14 +1398,15 @@ export default function App() {
             isMobile={isMobile}
           />
         ))}
-        <Taskbar
-          openApps={openApps}
-          onFocus={openOrFocusApp}
-          onLock={handleLock}
-          onPowerOff={handlePowerOff}
-          onShowApps={() => setShowAllApps(true)}
-          isMobile={isMobile}
-        />
+
+        <footer className="absolute bottom-0 left-0 right-0 h-14">
+          <Taskbar
+            openApps={openApps}
+            onFocus={openOrFocusApp}
+            onLock={handleLock}
+            onPowerOff={handlePowerOff}
+          />
+        </footer>
       </div>
     </div>
   );
