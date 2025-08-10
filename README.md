@@ -1,28 +1,34 @@
 # Zorin OS - Interactive Portfolio
 
-Welcome to my interactive portfolio, designed to look and feel like the Zorin OS desktop environment. This project is more than just a list of my skills and experiences; it's a fully functional, web-based operating system that you can explore.
+Welcome to my interactive portfolio. This project showcases my skills not just through a list of projects, but through a dynamic, hands-on experience. On a desktop, it's a faithful re-creation of the Zorin OS environment. On a mobile device, it intelligently transforms into a sleek, native-feeling mobile UI.
 
-**[➡️ View the Live Demo Here](https://shashank-tomar.vercel.app/)** 
+**[➡️ View the Live Demo Here](https://shashank-tomar.vercel.app/)**
 
+### Desktop Experience
+<img width="1366" height="639" alt="Desktop View" src="https://github.com/user-attachments/assets/8708cb5a-4258-49c1-aed7-8c207de32325" />
 
- <img width="1366" height="639" alt="image" src="https://github.com/user-attachments/assets/8708cb5a-4258-49c1-aed7-8c207de32325" />
-
-
+### Mobile Experience
+<img width="1080" height="2010" alt="Screenshot_20250810-181446" src="https://github.com/user-attachments/assets/00b4fadb-7f6b-4f16-9576-6da9896075d5" />
 
 ## ✨ Core Features
 
-This portfolio is built from the ground up to be a dynamic and engaging experience. Here are some of the key features you can interact with:
+This portfolio is built to be a dynamic and engaging experience. Here are some of the key features:
 
-*   **A Familiar Desktop Experience:** Navigate a realistic OS environment with a desktop, taskbar, and application grid.
-*   **Window Management:** Open multiple applications at once. You can drag, resize, maximize, and minimize windows, just like in a real OS.
+*   **True Responsive Design: Dual-Interface Experience**
+    *   **Desktop UI:** A fully interactive desktop environment with a taskbar, draggable windows, and multi-tasking capabilities.
+    *   **Mobile UI:** A clean, native-feeling interface with a top status bar, a home screen app grid, and full-screen app views.
+
 *   **Working Applications:**
     *   **About Me:** A comprehensive hub detailing my education, skills, professional experience, and achievements.
     *   **VS Code:** A realistic mock-up of the Visual Studio Code editor, showcasing the project's own source code.
-    *   **Terminal:** An interactive terminal where you can run mock commands like `ls`, `help`, and even `meme` to fetch a random meme from the web.
+    *   **Terminal:** An interactive terminal where you can run mock commands like `ls`, `help`, and even `meme` to fetch a random meme.
+    *   **And more:** A functional Calculator, a Spotify music player, and a Settings app to toggle between light and dark modes.
+
+*   **AI-Powered Features:**
     *   **AI Counselor:** A chatbot powered by the **Google Gemini API** that can answer questions about my resume and career path.
     *   **Project Analyzer:** Another Gemini-powered feature within the "About Me" app that can generate AI summaries of my projects.
-    *   **And more:** Functional Calculator, Spotify music player, and a Settings app to toggle between light and dark themes.
-*   **Secure API Integration:** All calls to the Gemini API are handled securely through a backend serverless function, ensuring that no secret keys are exposed on the frontend.
+
+*   **Secure API Integration:** All calls to the Gemini API are handled securely through a backend serverless function, ensuring that no secret keys are exposed on the client-side.
 
 ## 🚀 Tech Stack
 
@@ -46,7 +52,7 @@ You will need to have `npm` (which comes with Node.js) and `git` installed on yo
 
 1.  **Clone the repository:**
     ```
-    git clone https://github.com/Shashank-Tomar-2004/portfolio.git
+    git clone https://github.com/shashank-tomar-2004/portfolio.git
     ```
 
 2.  **Navigate to the project directory:**
@@ -64,7 +70,7 @@ You will need to have `npm` (which comes with Node.js) and `git` installed on yo
     *   Create a new file in the root of the project named `.env.local`.
     *   Inside this file, add the following line, replacing `your_gemini_api_key` with your actual key from Google AI Studio:
         ```
-        REACT_APP_GEMINI_API_KEY=your_gemini_api_key
+        GEMINI_API_KEY=your_gemini_api_key
         ```
 
 5.  **Start the development server:**
