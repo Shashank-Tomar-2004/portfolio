@@ -8,7 +8,9 @@ Welcome to my interactive portfolio. This project showcases my skills not just t
 <img width="1366" height="639" alt="Desktop View" src="https://github.com/user-attachments/assets/8708cb5a-4258-49c1-aed7-8c207de32325" />
 
 ### Mobile Experience
-<img width="1080" height="2010" alt="Screenshot_20250810-181446" src="https://github.com/user-attachments/assets/00b4fadb-7f6b-4f16-9576-6da9896075d5" />
+<p align="center">
+  <img width="270" alt="Mobile UI" src="https://github.com/user-attachments/assets/00b4fadb-7f6b-4f16-9576-6da9896075d5">
+</p>
 
 ## ✨ Core Features
 
