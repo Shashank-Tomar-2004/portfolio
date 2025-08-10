@@ -1,18 +1,17 @@
 /*
  * =================================================================
- * FILE: App.js (Zorin OS Portfolio) - STAGE 8: NATIVE MOBILE UI
+ * FILE: App.js (Zorin OS Portfolio) - STAGE 8.1: DEFINITIVE FIX
  * =================================================================
  *
- * This final version implements a completely bespoke mobile UI,
- * moving away from a desktop simulation to a more familiar and
- * intuitive mobile OS experience.
+ * This version corrects the layout regressions from the previous
+ * attempt and properly implements the separate, native mobile UI.
  *
  * Key Upgrades:
- * - DEDICATED MOBILE UI: The app now renders a completely different
- *   UI on mobile, featuring a top status bar and an app grid.
- * - NATIVE APP NAVIGATION: On mobile, apps open in a true full-screen
- *   mode and are closed with a dedicated back button.
- * - The desktop experience remains unchanged.
+ * - DESKTOP UI RESTORED: The desktop layout is returned to its
+ *   fully functional state with a visible taskbar.
+ * - TRUE MOBILE UI IMPLEMENTED: The app now correctly renders a
+ *   completely separate UI on mobile, with a top status bar,
+ *   app grid, and full-screen app navigation.
  *
  * =================================================================
  */
@@ -45,7 +44,6 @@ import {
   BookOpen,
   Trash2,
   RotateCcw,
-  LayoutGrid,
   Code2,
   TerminalSquare,
   Calculator,
@@ -232,7 +230,7 @@ const callGeminiAPI = async (prompt) => {
 };
 
 // =================================================================
-// OS-THEMED APP COMPONENTS
+// OS-THEMED APP COMPONENTS (shared logic)
 // =================================================================
 const AboutSection = () => (
   <div className="p-4 md:p-6 text-center flex flex-col items-center">
@@ -334,11 +332,7 @@ const ProjectsSection = () => {
   const [loading, setLoading] = useState({});
   const generateSummary = async (project) => {
     setLoading((prev) => ({ ...prev, [project.id]: true }));
-    const prompt = `Generate a professional, one-paragraph summary for a software project titled "${
-      project.title
-    }" that uses the following technologies: ${project.tech.join(
-      ", "
-    )}. The project is described as: "${project.description}"`;
+    const prompt = `Generate a professional, one-paragraph summary for a software project titled "${project.title}". The description is: "${project.description}"`;
     const summary = await callGeminiAPI(prompt);
     setSummaries((prev) => ({ ...prev, [project.id]: summary }));
     setLoading((prev) => ({ ...prev, [project.id]: false }));
@@ -392,7 +386,7 @@ const ProjectsSection = () => {
               <div className="mt-3 p-3 bg-gray-100 dark:bg-gray-700/50 rounded-md text-sm">
                 {" "}
                 <p className="font-semibold mb-1 text-purple-700 dark:text-purple-400">
-                  ✨ AI Generated Summary:
+                  ✨ AI Summary:
                 </p>{" "}
                 <p>{summaries[project.id]}</p>{" "}
               </div>
@@ -470,7 +464,7 @@ const AboutApp = ({ isMobile, isSidebarOpen, onSidebarToggle }) => {
             key={key}
             onClick={() => {
               setActiveSection(key);
-              if (isMobile) onSidebarToggle();
+              if (isMobile && onSidebarToggle) onSidebarToggle();
             }}
             className={`flex items-center gap-3 w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
               activeSection === key
@@ -488,7 +482,6 @@ const AboutApp = ({ isMobile, isSidebarOpen, onSidebarToggle }) => {
     </div>
   );
 };
-
 const VSCodeApp = ({ isMobile, isSidebarOpen }) => {
   const [activeFile, setActiveFile] = useState("App.js");
   const sidebarClass = isMobile
@@ -498,13 +491,16 @@ const VSCodeApp = ({ isMobile, isSidebarOpen }) => {
     : "";
   return (
     <div className="bg-[#1e1e1e] h-full text-white font-mono text-sm flex flex-col">
+      {" "}
       <div className="flex-grow flex relative overflow-hidden">
+        {" "}
         <div
           className={`absolute md:relative z-20 w-48 bg-[#252526] h-full p-2 flex-shrink-0 flex flex-col transition-transform transform ${sidebarClass}`}
         >
+          {" "}
           <h3 className="text-xs uppercase text-gray-400 tracking-wider mb-2 px-2">
             Explorer
-          </h3>
+          </h3>{" "}
           <div className="space-y-1">
             {Object.keys(sourceCode).map((file) => (
               <button
@@ -517,30 +513,33 @@ const VSCodeApp = ({ isMobile, isSidebarOpen }) => {
                 <File className="w-4 h-4 text-blue-400" /> {file}
               </button>
             ))}
-          </div>
-        </div>
+          </div>{" "}
+        </div>{" "}
         <div className="flex-grow flex flex-col">
+          {" "}
           <div className="bg-[#252526] flex-shrink-0">
+            {" "}
             <div className="bg-[#37373d] inline-flex items-center px-4 py-2 w-full md:w-auto border-t-2 border-blue-500">
-              <File className="w-4 h-4 text-blue-400 mr-2" /> {activeFile}
-            </div>
-          </div>
+              {" "}
+              <File className="w-4 h-4 text-blue-400 mr-2" /> {activeFile}{" "}
+            </div>{" "}
+          </div>{" "}
           <div className="flex-grow p-4 overflow-auto bg-[#1e1e1e]">
+            {" "}
             <pre>
               <code>{sourceCode[activeFile]}</code>
-            </pre>
-          </div>
-        </div>
-      </div>
+            </pre>{" "}
+          </div>{" "}
+        </div>{" "}
+      </div>{" "}
       <div className="h-8 bg-[#1e1e1e] border-t border-gray-700 items-center px-4 text-xs gap-4 hidden md:flex">
         <span>PROBLEMS</span>
         <span>OUTPUT</span>
         <span className="border-b-2 border-blue-500">TERMINAL</span>
-      </div>
+      </div>{" "}
     </div>
   );
 };
-// Other simple apps remain unchanged
 const AICounselorApp = () => {
   const [messages, setMessages] = useState([
     {
@@ -912,7 +911,7 @@ const ContactApp = () => (
       Get In Touch
     </h2>{" "}
     <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-      I'm open to new opportunities and collaborations.
+      I'm open to new opportunities.
     </p>{" "}
     <a
       href={`mailto:${personalInfo.email}`}
@@ -966,7 +965,7 @@ const ZorinIcon = (props) => (
 );
 const BootScreen = ({ onBooted }) => {
   useEffect(() => {
-    const timer = setTimeout(onBooted, 2500);
+    const timer = setTimeout(onBooted, 1500);
     return () => clearTimeout(timer);
   }, [onBooted]);
   return (
@@ -1068,7 +1067,70 @@ const apps = [
   },
 ];
 
-// ================== DESKTOP COMPONENTS ==================
+// ================== DESKTOP UI ==================
+const DesktopUI = ({ theme, handleLock, handlePowerOff }) => {
+  const [openApps, setOpenApps] = useState([]);
+  const openOrFocusApp = (appId) => {
+    setOpenApps((currentApps) => {
+      const appIndex = currentApps.findIndex((app) => app.id === appId);
+      const maxZ =
+        Math.max(10, ...currentApps.map((app) => app.zIndex || 0)) + 1;
+      if (appIndex === -1) {
+        return [
+          ...currentApps,
+          { id: appId, zIndex: maxZ, isMinimized: false, isMaximized: false },
+        ];
+      }
+      return currentApps.map((app) =>
+        app.id === appId
+          ? { ...app, zIndex: maxZ, isMinimized: false }
+          : { ...app, zIndex: app.zIndex > 10 ? app.zIndex - 1 : app.zIndex }
+      );
+    });
+  };
+  const closeApp = (appId) =>
+    setOpenApps((currentApps) => currentApps.filter((app) => app.id !== appId));
+  const minimizeApp = (appId) =>
+    setOpenApps((currentApps) =>
+      currentApps.map((app) =>
+        app.id === appId ? { ...app, isMinimized: true } : app
+      )
+    );
+  const maximizeApp = (appId, isMaximized) =>
+    setOpenApps((currentApps) =>
+      currentApps.map((app) =>
+        app.id === appId ? { ...app, isMaximized } : app
+      )
+    );
+  return (
+    <div className="h-screen w-screen relative">
+      <main className="h-full">
+        <div className="p-4 h-full flex flex-col flex-wrap content-start gap-y-2">
+          {apps.map((app) => (
+            <DesktopIcon key={app.id} app={app} onOpen={openOrFocusApp} />
+          ))}
+        </div>
+        {openApps.map((app) => (
+          <DesktopWindow
+            key={app.id}
+            app={app}
+            onClose={closeApp}
+            onMinimize={minimizeApp}
+            onMaximize={maximizeApp}
+            onFocus={openOrFocusApp}
+          />
+        ))}
+      </main>
+      <footer className="absolute bottom-0 left-0 right-0 h-14 z-40">
+        <DesktopTaskbar
+          openApps={openApps}
+          onFocus={openOrFocusApp}
+          onLock={handleLock}
+        />
+      </footer>
+    </div>
+  );
+};
 const DesktopWindow = ({ app, onClose, onMinimize, onMaximize, onFocus }) => {
   const [isMaximized, setIsMaximized] = useState(false);
   const handleMaximize = () => {
@@ -1101,20 +1163,23 @@ const DesktopWindow = ({ app, onClose, onMinimize, onMaximize, onFocus }) => {
       } bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-gray-300/50 dark:border-gray-600/50 shadow-2xl flex-col overflow-hidden`}
       onClick={() => onFocus(app.id)}
     >
+      {" "}
       <div
         ref={dragRef}
         className={`h-8 rounded-t-lg flex items-center justify-between px-2 ${
           isMaximized ? "" : "cursor-move"
         } bg-gray-200/80 dark:bg-gray-900/80 flex-shrink-0 border-b dark:border-gray-700/50`}
       >
+        {" "}
         <div className="flex items-center gap-2">
+          {" "}
           {typeof appInfo.icon === "string" ? (
             <img src={appInfo.icon} alt={appInfo.name} className="w-4 h-4" />
           ) : (
             <appInfo.icon className="w-4 h-4 text-gray-800 dark:text-gray-200" />
           )}
           <span className="text-xs font-semibold">{appInfo.name}</span>
-        </div>
+        </div>{" "}
         <div className="flex items-center gap-2">
           <button
             onClick={(e) => {
@@ -1144,9 +1209,9 @@ const DesktopWindow = ({ app, onClose, onMinimize, onMaximize, onFocus }) => {
             <X className="w-3 h-3 text-black/50" />
           </button>
         </div>
-      </div>
+      </div>{" "}
       <div className="flex-grow overflow-hidden">
-        <AppComponent />
+        <AppComponent isMobile={false} />
       </div>
     </div>
   );
@@ -1230,7 +1295,26 @@ const DesktopTaskbar = ({ openApps, onFocus, onLock }) => {
   );
 };
 
-// ================== MOBILE COMPONENTS ==================
+// ================== MOBILE UI ==================
+const MobileUI = ({ theme, toggleTheme, handleLock }) => {
+  const [activeApp, setActiveApp] = useState(null);
+  return (
+    <div className="h-screen w-screen flex flex-col">
+      <MobileTopBar theme={theme} onLock={handleLock} />
+      <div className="flex-grow overflow-y-auto">
+        <MobileHomeScreen onOpen={setActiveApp} />
+      </div>
+      {activeApp && (
+        <MobileAppView
+          appId={activeApp}
+          onClose={() => setActiveApp(null)}
+          theme={theme}
+          toggleTheme={toggleTheme}
+        />
+      )}
+    </div>
+  );
+};
 const MobileTopBar = ({ theme, onLock }) => {
   const [time, setTime] = useState(new Date());
   useEffect(() => {
@@ -1239,7 +1323,7 @@ const MobileTopBar = ({ theme, onLock }) => {
   }, []);
   return (
     <div
-      className={`w-full h-8 px-4 flex justify-between items-center bg-black/20 backdrop-blur-sm text-sm font-semibold ${
+      className={`w-full h-8 px-4 flex-shrink-0 flex justify-between items-center bg-black/20 backdrop-blur-sm text-sm font-semibold ${
         theme === "light" ? "text-black" : "text-white"
       }`}
     >
@@ -1289,174 +1373,105 @@ const MobileAppView = ({ appId, onClose, theme, toggleTheme }) => {
   if (!appInfo) return null;
   const AppComponent = appInfo.component;
   return (
-    <div className="absolute inset-0 bg-gray-100 dark:bg-gray-900 z-30 flex flex-col">
+    <div className="absolute inset-0 bg-gray-100 dark:bg-gray-900 z-30 flex flex-col animate-slide-in">
+      {" "}
       <header className="h-12 flex-shrink-0 bg-gray-200 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700 flex items-center justify-between px-2">
+        {" "}
         <button onClick={onClose} className="p-2">
           <ArrowLeft className="w-6 h-6 text-gray-800 dark:text-gray-200" />
-        </button>
+        </button>{" "}
         <div className="flex items-center gap-2">
+          {" "}
           {typeof appInfo.icon === "string" ? (
             <img src={appInfo.icon} alt={appInfo.name} className="w-6 h-6" />
           ) : (
             <appInfo.icon className="w-6 h-6 text-gray-800 dark:text-gray-200" />
-          )}
+          )}{" "}
           <h2 className="font-semibold text-lg text-gray-800 dark:text-gray-200">
             {appInfo.name}
-          </h2>
-        </div>
+          </h2>{" "}
+        </div>{" "}
         <div className="w-8">
+          {" "}
           {appInfo.hasSidebar && (
             <button onClick={() => setIsSidebarOpen((o) => !o)} className="p-1">
-              <Menu className="w-6 h-6 text-gray-800 dark:text-gray-200" />
+              {" "}
+              <Menu className="w-6 h-6 text-gray-800 dark:text-gray-200" />{" "}
             </button>
-          )}
-        </div>
-      </header>
+          )}{" "}
+        </div>{" "}
+      </header>{" "}
       <main className="flex-grow overflow-y-auto">
+        {" "}
         <AppComponent
           theme={theme}
           toggleTheme={toggleTheme}
           isMobile={true}
           isSidebarOpen={isSidebarOpen}
           onSidebarToggle={() => setIsSidebarOpen(false)}
-        />
-      </main>
+        />{" "}
+      </main>{" "}
     </div>
   );
 };
 
 // =======================================================
-// Main App Component (with Desktop/Mobile logic)
+// Main App Component
 // =======================================================
 export default function App() {
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const [isBooting, setIsBooting] = useState(true);
   const [isLocked, setIsLocked] = useState(true);
   const [isPoweredOff, setIsPoweredOff] = useState(false);
   const [theme, setTheme] = useState("dark");
 
-  // Desktop state
-  const [openApps, setOpenApps] = useState([]);
-
-  // Mobile state
-  const [activeMobileApp, setActiveMobileApp] = useState(null);
-
   useEffect(() => {
     document.body.className = theme;
   }, [theme]);
-  const handleLock = () => {
-    setIsLocked(true);
-    setOpenApps([]);
-    setActiveMobileApp(null);
-  };
+  const handleBoot = () => setIsBooting(false);
+  const handleLock = () => setIsLocked(true);
   const handleUnlock = () => setIsLocked(false);
   const handlePowerOff = () => setIsPoweredOff(true);
   const toggleTheme = () =>
     setTheme((current) => (current === "light" ? "dark" : "light"));
-
-  // Desktop app management
-  const openOrFocusApp = (appId) => {
-    setOpenApps((currentApps) => {
-      const appIndex = currentApps.findIndex((app) => app.id === appId);
-      const maxZ =
-        Math.max(10, ...currentApps.map((app) => app.zIndex || 0)) + 1;
-      if (appIndex === -1) {
-        return [
-          ...currentApps,
-          { id: appId, zIndex: maxZ, isMinimized: false, isMaximized: false },
-        ];
-      }
-      return currentApps.map((app) =>
-        app.id === appId
-          ? { ...app, zIndex: maxZ, isMinimized: false }
-          : { ...app, zIndex: app.zIndex > 10 ? app.zIndex - 1 : app.zIndex }
-      );
-    });
-  };
-  const closeApp = (appId) =>
-    setOpenApps((currentApps) => currentApps.filter((app) => app.id !== appId));
-  const minimizeApp = (appId) =>
-    setOpenApps((currentApps) =>
-      currentApps.map((app) =>
-        app.id === appId ? { ...app, isMinimized: true } : app
-      )
-    );
-  const maximizeApp = (appId, isMaximized) =>
-    setOpenApps((currentApps) =>
-      currentApps.map((app) =>
-        app.id === appId ? { ...app, isMaximized } : app
-      )
-    );
 
   const wallpaperUrl =
     theme === "light"
       ? "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200"
       : "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200";
 
-  if (isPoweredOff) return <PowerOffScreen />;
-  if (isLocked) return <LockScreen onUnlock={handleUnlock} theme={theme} />;
-
-  // ================== RENDER MOBILE UI ==================
-  if (isMobile) {
-    return (
-      <div className="h-screen w-screen bg-cover bg-center font-sans overflow-hidden flex flex-col">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${wallpaperUrl})` }}
-        ></div>
-        <div className="absolute inset-0 bg-black/20"></div>
-
-        <div className="relative z-10 h-full w-full flex flex-col">
-          <MobileTopBar theme={theme} onLock={handleLock} />
-          <div className="flex-grow overflow-y-auto">
-            <MobileHomeScreen onOpen={setActiveMobileApp} />
-          </div>
-        </div>
-
-        {activeMobileApp && (
-          <MobileAppView
-            appId={activeMobileApp}
-            onClose={() => setActiveMobileApp(null)}
-            theme={theme}
-            toggleTheme={toggleTheme}
-          />
-        )}
-      </div>
-    );
-  }
-
-  // ================== RENDER DESKTOP UI ==================
-  return (
-    <div className="h-screen w-screen bg-cover bg-center font-sans overflow-hidden">
-      <BootScreen onBooted={() => {}} /> {/* Simplified for desktop */}
+  const sharedBackground = (
+    <>
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${wallpaperUrl})` }}
       ></div>
-      <div className="absolute inset-0 bg-black/10"></div>
-      <main className="relative z-10 h-[calc(100%-3.5rem)]">
-        <div className="p-4 h-full flex flex-col flex-wrap content-start gap-y-2">
-          {apps.map((app) => (
-            <DesktopIcon key={app.id} app={app} onOpen={openOrFocusApp} />
-          ))}
-        </div>
-        {openApps.map((app) => (
-          <DesktopWindow
-            key={app.id}
-            app={app}
-            onClose={closeApp}
-            onMinimize={minimizeApp}
-            onMaximize={maximizeApp}
-            onFocus={openOrFocusApp}
+      <div className="absolute inset-0 bg-black/20"></div>
+    </>
+  );
+
+  if (isBooting && !isMobile) return <BootScreen onBooted={handleBoot} />;
+  if (isPoweredOff) return <PowerOffScreen />;
+  if (isLocked) return <LockScreen onUnlock={handleUnlock} theme={theme} />;
+
+  return (
+    <div className="h-screen w-screen bg-black font-sans overflow-hidden">
+      {sharedBackground}
+      <div className="relative z-10 h-full w-full">
+        {isMobile ? (
+          <MobileUI
+            theme={theme}
+            toggleTheme={toggleTheme}
+            handleLock={handleLock}
           />
-        ))}
-      </main>
-      <footer className="relative z-20 h-14">
-        <DesktopTaskbar
-          openApps={openApps}
-          onFocus={openOrFocusApp}
-          onLock={handleLock}
-        />
-      </footer>
+        ) : (
+          <DesktopUI
+            theme={theme}
+            handleLock={handleLock}
+            handlePowerOff={handlePowerOff}
+          />
+        )}
+      </div>
     </div>
   );
 }
