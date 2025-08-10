@@ -54,7 +54,7 @@ import {
 } from "lucide-react";
 
 // =================================================================
-// RESPONSIVE UTILITY HOOK
+// UTILITY HOOKS
 // =================================================================
 const useMediaQuery = (query) => {
   const [matches, setMatches] = useState(false);
@@ -68,6 +68,41 @@ const useMediaQuery = (query) => {
     return () => window.removeEventListener("resize", listener);
   }, [matches, query]);
   return matches;
+};
+
+const useDraggable = (id, onFocus, isMaximized) => {
+  const [position, setPosition] = useState({
+    x: 50 + Math.random() * 200,
+    y: 50 + Math.random() * 100,
+  });
+  const posRef = useRef(position);
+  posRef.current = position;
+  const dragHandleRef = useRef(null);
+  useEffect(() => {
+    const handle = dragHandleRef.current;
+    if (!handle) return;
+    const onMouseDown = (e) => {
+      if (isMaximized || e.target.closest("button")) return;
+      onFocus(id);
+      const startMouse = { x: e.clientX, y: e.clientY };
+      const startPos = posRef.current;
+      const onMouseMove = (moveEvent) => {
+        setPosition({
+          x: startPos.x + (moveEvent.clientX - startMouse.x),
+          y: startPos.y + (moveEvent.clientY - startMouse.y),
+        });
+      };
+      const onMouseUp = () => {
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp, { once: true });
+      };
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp, { once: true });
+    };
+    handle.addEventListener("mousedown", onMouseDown);
+    return () => handle.removeEventListener("mousedown", onMouseDown);
+  }, [id, onFocus, isMaximized]);
+  return [position, dragHandleRef];
 };
 
 // =================================================================
@@ -1102,6 +1137,7 @@ const DesktopUI = ({ theme, handleLock, handlePowerOff }) => {
         app.id === appId ? { ...app, isMaximized } : app
       )
     );
+
   return (
     <div className="h-screen w-screen relative">
       <main className="h-full">
@@ -1134,8 +1170,9 @@ const DesktopUI = ({ theme, handleLock, handlePowerOff }) => {
 const DesktopWindow = ({ app, onClose, onMinimize, onMaximize, onFocus }) => {
   const [isMaximized, setIsMaximized] = useState(false);
   const handleMaximize = () => {
-    setIsMaximized((m) => !m);
-    onMaximize(app.id, !isMaximized);
+    const newMaximizedState = !isMaximized;
+    setIsMaximized(newMaximizedState);
+    onMaximize(app.id, newMaximizedState);
   };
   const [position, dragRef] = useDraggable(app.id, onFocus, isMaximized);
   const appInfo = apps.find((a) => a.id === app.id);
@@ -1163,14 +1200,12 @@ const DesktopWindow = ({ app, onClose, onMinimize, onMaximize, onFocus }) => {
       } bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-gray-300/50 dark:border-gray-600/50 shadow-2xl flex-col overflow-hidden`}
       onClick={() => onFocus(app.id)}
     >
-      {" "}
       <div
         ref={dragRef}
         className={`h-8 rounded-t-lg flex items-center justify-between px-2 ${
           isMaximized ? "" : "cursor-move"
         } bg-gray-200/80 dark:bg-gray-900/80 flex-shrink-0 border-b dark:border-gray-700/50`}
       >
-        {" "}
         <div className="flex items-center gap-2">
           {" "}
           {typeof appInfo.icon === "string" ? (
@@ -1179,7 +1214,7 @@ const DesktopWindow = ({ app, onClose, onMinimize, onMaximize, onFocus }) => {
             <appInfo.icon className="w-4 h-4 text-gray-800 dark:text-gray-200" />
           )}
           <span className="text-xs font-semibold">{appInfo.name}</span>
-        </div>{" "}
+        </div>
         <div className="flex items-center gap-2">
           <button
             onClick={(e) => {
@@ -1209,7 +1244,7 @@ const DesktopWindow = ({ app, onClose, onMinimize, onMaximize, onFocus }) => {
             <X className="w-3 h-3 text-black/50" />
           </button>
         </div>
-      </div>{" "}
+      </div>
       <div className="flex-grow overflow-hidden">
         <AppComponent isMobile={false} />
       </div>
@@ -1425,11 +1460,50 @@ export default function App() {
   const [isPoweredOff, setIsPoweredOff] = useState(false);
   const [theme, setTheme] = useState("dark");
 
+  // Desktop-specific state
+  const [openApps, setOpenApps] = useState([]);
+  const openOrFocusApp = (appId) => {
+    setOpenApps((currentApps) => {
+      const appIndex = currentApps.findIndex((app) => app.id === appId);
+      const maxZ =
+        Math.max(10, ...currentApps.map((app) => app.zIndex || 0)) + 1;
+      if (appIndex === -1) {
+        return [
+          ...currentApps,
+          { id: appId, zIndex: maxZ, isMinimized: false, isMaximized: false },
+        ];
+      }
+      return currentApps.map((app) =>
+        app.id === appId
+          ? { ...app, zIndex: maxZ, isMinimized: false }
+          : { ...app, zIndex: app.zIndex > 10 ? app.zIndex - 1 : app.zIndex }
+      );
+    });
+  };
+  const closeApp = (appId) =>
+    setOpenApps((currentApps) => currentApps.filter((app) => app.id !== appId));
+  const minimizeApp = (appId) =>
+    setOpenApps((currentApps) =>
+      currentApps.map((app) =>
+        app.id === appId ? { ...app, isMinimized: true } : app
+      )
+    );
+  const maximizeApp = (appId, isMaximized) =>
+    setOpenApps((currentApps) =>
+      currentApps.map((app) =>
+        app.id === appId ? { ...app, isMaximized } : app
+      )
+    );
+
   useEffect(() => {
     document.body.className = theme;
   }, [theme]);
   const handleBoot = () => setIsBooting(false);
-  const handleLock = () => setIsLocked(true);
+  const handleLock = () => {
+    setIsLocked(true);
+    // Reset states on lock for a clean experience
+    setOpenApps([]);
+  };
   const handleUnlock = () => setIsLocked(false);
   const handlePowerOff = () => setIsPoweredOff(true);
   const toggleTheme = () =>
@@ -1469,6 +1543,12 @@ export default function App() {
             theme={theme}
             handleLock={handleLock}
             handlePowerOff={handlePowerOff}
+            openApps={openApps}
+            onOpen={openOrFocusApp}
+            onClose={closeApp}
+            onMinimize={minimizeApp}
+            onMaximize={maximizeApp}
+            onFocus={openOrFocusApp}
           />
         )}
       </div>
