@@ -1,18 +1,18 @@
 /*
  * =================================================================
- * FILE: App.js (Zorin OS Portfolio) - STAGE 4: SECURE DEPLOYMENT
+ * FILE: App.js (Zorin OS Portfolio) - STAGE 5: MOBILE RESPONSIVENESS
  * =================================================================
  *
- * This final version re-implements the Gemini API features in a
- * secure way, using a backend serverless function to protect the
- * API key. It is now ready for deployment.
+ * This version introduces responsive design to ensure a great user
+ * experience on mobile devices.
  *
  * Key Upgrades:
- * - SECURE API CALLS: The `callGeminiAPI` function now sends requests
- *   to a local `/api/gemini` endpoint, which will be handled by
- *   Vercel's serverless functions.
- * - GEMINI FEATURES RESTORED: The 'AI Counselor' app and the
- *   'Analyse Project' button are fully functional again.
+ * - MOBILE DETECTION: A new `useMediaQuery` hook detects small screens.
+ * - FULL-SCREEN APPS: On mobile, all apps open in a maximized, full-
+ *   screen view for better usability.
+ * - RESPONSIVE LAYOUT: The taskbar and desktop icons now adapt their
+ *   layout to fit on narrow screens, preventing overflow.
+ * - All previous features and security measures are maintained.
  *
  * =================================================================
  */
@@ -53,6 +53,23 @@ import {
   Settings,
   Power,
 } from "lucide-react";
+
+// =================================================================
+// RESPONSIVE UTILITY HOOK
+// =================================================================
+const useMediaQuery = (query) => {
+  const [matches, setMatches] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    if (media.matches !== matches) {
+      setMatches(media.matches);
+    }
+    const listener = () => setMatches(media.matches);
+    window.addEventListener("resize", listener);
+    return () => window.removeEventListener("resize", listener);
+  }, [matches, query]);
+  return matches;
+};
 
 // =================================================================
 // DATA & SOURCE CODE
@@ -213,7 +230,6 @@ const callGeminiAPI = async (prompt) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt }),
     });
-
     const result = await response.json();
     if (!response.ok) {
       throw new Error(result.error || "An unknown error occurred.");
@@ -226,7 +242,7 @@ const callGeminiAPI = async (prompt) => {
 };
 
 // =================================================================
-// OS-THEMED APP COMPONENTS (with AI features restored)
+// OS-THEMED APP COMPONENTS
 // =================================================================
 const AboutSection = () => (
   <div className="p-6 text-center flex flex-col items-center">
@@ -323,11 +339,9 @@ const SkillsSection = () => (
     </div>{" "}
   </div>
 );
-
 const ProjectsSection = () => {
   const [summaries, setSummaries] = useState({});
   const [loading, setLoading] = useState({});
-
   const generateSummary = async (project) => {
     setLoading((prev) => ({ ...prev, [project.id]: true }));
     const prompt = `Generate a professional, one-paragraph summary for a software project titled "${
@@ -339,7 +353,6 @@ const ProjectsSection = () => {
     setSummaries((prev) => ({ ...prev, [project.id]: summary }));
     setLoading((prev) => ({ ...prev, [project.id]: false }));
   };
-
   return (
     <div className="p-6">
       {" "}
@@ -400,7 +413,6 @@ const ProjectsSection = () => {
     </div>
   );
 };
-
 const ExperienceSection = () => (
   <div className="p-6">
     {" "}
@@ -430,7 +442,6 @@ const ExperienceSection = () => (
     </div>{" "}
   </div>
 );
-
 const AboutApp = () => {
   const [activeSection, setActiveSection] = useState("about");
   const sections = {
@@ -456,7 +467,7 @@ const AboutApp = () => {
   return (
     <div className="flex h-full bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
       {" "}
-      <div className="w-56 bg-gray-100 dark:bg-gray-900 p-4 border-r dark:border-gray-700 flex flex-col">
+      <div className="w-56 bg-gray-100 dark:bg-gray-900 p-4 border-r dark:border-gray-700 flex-col hidden md:flex">
         {" "}
         {Object.entries(sections).map(([key, { label, icon: Icon }]) => (
           <button
@@ -480,7 +491,6 @@ const AboutApp = () => {
     </div>
   );
 };
-
 const AICounselorApp = () => {
   const [messages, setMessages] = useState([
     {
@@ -578,7 +588,6 @@ const AICounselorApp = () => {
     </div>
   );
 };
-
 const TerminalApp = () => {
   const [history, setHistory] = useState([
     {
@@ -684,18 +693,16 @@ const TerminalApp = () => {
     </div>
   );
 };
-
-// Other apps mostly unchanged
 const VSCodeApp = () => {
   const [activeFile, setActiveFile] = useState("App.js");
   return (
     <div className="bg-[#1e1e1e] h-full text-white font-mono text-sm flex flex-col">
       <div className="flex-grow flex">
-        <div className="bg-[#252526] w-12 p-2 flex flex-col items-center gap-4 border-r border-gray-700">
+        <div className="bg-[#252526] w-12 p-2 flex-col items-center gap-4 border-r border-gray-700 hidden md:flex">
           <File className="text-gray-400 hover:text-white" />
           <Folder className="text-gray-400 hover:text-white" />
         </div>
-        <div className="bg-[#252526] w-48 p-2 flex-shrink-0">
+        <div className="bg-[#252526] w-48 p-2 flex-shrink-0 hidden md:flex">
           <h3 className="text-xs uppercase text-gray-400 tracking-wider mb-2 px-2">
             Explorer
           </h3>
@@ -715,7 +722,7 @@ const VSCodeApp = () => {
         </div>
         <div className="flex-grow flex flex-col">
           <div className="bg-[#252526] flex-shrink-0">
-            <div className="bg-[#37373d] inline-flex items-center px-4 py-2 border-t-2 border-blue-500">
+            <div className="bg-[#37373d] inline-flex items-center px-4 py-2 md:border-t-2 border-blue-500">
               <File className="w-4 h-4 text-blue-400 mr-2" /> {activeFile}
             </div>
           </div>
@@ -726,7 +733,7 @@ const VSCodeApp = () => {
           </div>
         </div>
       </div>
-      <div className="h-8 bg-[#1e1e1e] border-t border-gray-700 flex items-center px-4 text-xs gap-4">
+      <div className="h-8 bg-[#1e1e1e] border-t border-gray-700 items-center px-4 text-xs gap-4 hidden md:flex">
         <span>PROBLEMS</span>
         <span>OUTPUT</span>
         <span className="border-b-2 border-blue-500">TERMINAL</span>
@@ -938,7 +945,7 @@ const ContactApp = () => (
 );
 
 // =================================================================
-// MAIN OS COMPONENTS
+// MAIN OS COMPONENTS (Updated for Responsiveness)
 // =================================================================
 const ZorinIcon = (props) => (
   <svg
@@ -1057,6 +1064,7 @@ const useDraggable = (id, onFocus, isMaximized) => {
   }, [id, onFocus, isMaximized]);
   return [position, dragHandleRef];
 };
+
 const Window = ({
   app,
   onClose,
@@ -1065,11 +1073,18 @@ const Window = ({
   onFocus,
   theme,
   toggleTheme,
+  isMobile,
 }) => {
-  const [position, dragRef] = useDraggable(app.id, onFocus, app.isMaximized);
+  const isActuallyMaximized = isMobile || app.isMaximized;
+  const [position, dragRef] = useDraggable(
+    app.id,
+    onFocus,
+    isActuallyMaximized
+  );
   const appInfo = apps.find((a) => a.id === app.id);
   if (!appInfo) return null;
   const AppComponent = appInfo.component;
+
   const windowSize =
     {
       calculator: "w-[300px] h-[450px]",
@@ -1077,14 +1092,17 @@ const Window = ({
       about: "w-[900px] h-[600px]",
       default: "w-[800px] h-[600px]",
     }[app.id] || "w-[800px] h-[600px]";
-  const windowClasses = app.isMaximized
-    ? "top-0 left-0 w-full h-[calc(100%-4rem)] rounded-none"
+
+  // On mobile, all windows are fullscreen. On desktop, they are either maximized or use their default size.
+  const windowClasses = isActuallyMaximized
+    ? "top-0 left-0 w-full h-full md:h-[calc(100%-3.5rem)] rounded-none"
     : `${windowSize} rounded-lg`;
+
   return (
     <div
       style={{
-        top: app.isMaximized ? 0 : position.y,
-        left: app.isMaximized ? 0 : position.x,
+        top: isActuallyMaximized ? 0 : position.y,
+        left: isActuallyMaximized ? 0 : position.x,
         zIndex: app.zIndex,
         display: app.isMinimized ? "none" : "flex",
       }}
@@ -1093,17 +1111,23 @@ const Window = ({
     >
       <div
         ref={dragRef}
-        className={`h-8 rounded-t-lg flex items-center justify-between px-2 ${
-          app.isMaximized ? "" : "cursor-move"
+        className={`h-10 md:h-8 rounded-t-lg flex items-center justify-between px-2 ${
+          isActuallyMaximized ? "" : "cursor-move"
         } bg-gray-200/80 dark:bg-gray-900/80 flex-shrink-0 border-b dark:border-gray-700/50`}
       >
         <div className="flex items-center gap-2">
           {typeof appInfo.icon === "string" ? (
-            <img src={appInfo.icon} alt={appInfo.name} className="w-4 h-4" />
+            <img
+              src={appInfo.icon}
+              alt={appInfo.name}
+              className="w-5 h-5 md:w-4 md:h-4"
+            />
           ) : (
-            <appInfo.icon className="w-4 h-4 text-gray-800 dark:text-gray-200" />
+            <appInfo.icon className="w-5 h-5 md:w-4 md:h-4 text-gray-800 dark:text-gray-200" />
           )}
-          <span className="text-xs font-semibold">{appInfo.name}</span>
+          <span className="text-sm md:text-xs font-semibold">
+            {appInfo.name}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -1111,27 +1135,28 @@ const Window = ({
               e.stopPropagation();
               onMinimize(app.id);
             }}
-            className="w-5 h-5 flex items-center justify-center bg-yellow-400 rounded-full hover:bg-yellow-500"
+            className="w-7 h-7 md:w-5 md:h-5 flex items-center justify-center bg-yellow-400 rounded-full hover:bg-yellow-500"
           >
-            <Minimize2 className="w-3 h-3 text-black/50" />
+            <Minimize2 className="w-4 h-4 md:w-3 md:h-3 text-black/50" />
           </button>
           <button
+            disabled={isMobile}
             onClick={(e) => {
               e.stopPropagation();
               onMaximize(app.id);
             }}
-            className="w-5 h-5 flex items-center justify-center bg-green-400 rounded-full hover:bg-green-500"
+            className="w-7 h-7 md:w-5 md:h-5 flex items-center justify-center bg-green-400 rounded-full hover:bg-green-500 disabled:opacity-50"
           >
-            <Maximize2 className="w-3 h-3 text-black/50" />
+            <Maximize2 className="w-4 h-4 md:w-3 md:h-3 text-black/50" />
           </button>
           <button
             onClick={(e) => {
               e.stopPropagation();
               onClose(app.id);
             }}
-            className="w-5 h-5 flex items-center justify-center bg-red-500 rounded-full hover:bg-red-600"
+            className="w-7 h-7 md:w-5 md:h-5 flex items-center justify-center bg-red-500 rounded-full hover:bg-red-600"
           >
-            <X className="w-3 h-3 text-black/50" />
+            <X className="w-4 h-4 md:w-3 md:h-3 text-black/50" />
           </button>
         </div>
       </div>
@@ -1141,13 +1166,14 @@ const Window = ({
     </div>
   );
 };
+
 const DesktopIcon = ({ app, onOpen }) => (
   <button
     onClick={() => onOpen(app.id)}
-    className="flex flex-col items-center justify-center gap-1 text-white text-xs font-medium w-24 h-24 p-2 rounded-lg hover:bg-white/10 focus:outline-none focus:bg-white/20 transition-colors"
+    className="flex flex-col items-center justify-center gap-1 text-white text-xs font-medium w-20 h-20 md:w-24 md:h-24 p-2 rounded-lg hover:bg-white/10 focus:outline-none focus:bg-white/20 transition-colors"
   >
     {" "}
-    <div className="w-12 h-12 flex items-center justify-center">
+    <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">
       {" "}
       {typeof app.icon === "string" ? (
         <img
@@ -1156,25 +1182,23 @@ const DesktopIcon = ({ app, onOpen }) => (
           className="w-full h-full object-contain"
         />
       ) : (
-        <app.icon className="w-10 h-10 text-white drop-shadow-lg" />
+        <app.icon className="w-8 h-8 md:w-10 md:h-10 text-white drop-shadow-lg" />
       )}{" "}
     </div>{" "}
     <span className="drop-shadow-lg text-center">{app.name}</span>{" "}
   </button>
 );
-const Taskbar = ({ openApps, onFocus, onLock, onPowerOff, onShowApps }) => {
+const Taskbar = ({ openApps, onFocus, onLock, onShowApps, isMobile }) => {
   const [time, setTime] = useState(new Date());
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
   const taskbarApps = apps.filter((app) =>
-    ["chrome", "vscode", "terminal", "spotify", "about", "settings"].includes(
-      app.id
-    )
+    ["chrome", "vscode", "terminal", "about", "settings"].includes(app.id)
   );
   return (
-    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-auto h-14 bg-gray-800/50 dark:bg-gray-900/50 backdrop-blur-xl rounded-2xl flex items-center justify-between px-3 shadow-lg border-black/10 dark:border-white/10 text-white">
+    <div className="absolute bottom-0 md:bottom-2 left-0 md:left-1/2 md:-translate-x-1/2 w-full md:w-auto h-14 bg-gray-800/50 dark:bg-gray-900/50 backdrop-blur-xl md:rounded-2xl flex items-center justify-between px-2 md:px-3 shadow-lg border-t md:border-t-0 border-black/10 dark:border-white/10 text-white">
       {" "}
       <div className="flex items-center gap-1">
         {" "}
@@ -1184,20 +1208,22 @@ const Taskbar = ({ openApps, onFocus, onLock, onPowerOff, onShowApps }) => {
         >
           <LayoutGrid className="w-5 h-5" />
         </button>{" "}
-        <button
-          onClick={() => onLock(true)}
-          className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10"
-        >
-          <Power className="w-5 h-5 text-blue-400" />
-        </button>{" "}
+        {!isMobile && (
+          <button
+            onClick={() => onLock(true)}
+            className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10"
+          >
+            <Power className="w-5 h-5 text-blue-400" />
+          </button>
+        )}{" "}
       </div>{" "}
-      <div className="flex items-center gap-1">
+      <div className="flex-1 flex justify-center items-center gap-1 overflow-x-auto mx-2">
         {" "}
         {taskbarApps.map((app) => (
           <button
             key={app.id}
             onClick={() => onFocus(app.id)}
-            className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 relative p-1"
+            className="w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-full hover:bg-white/10 relative p-1"
           >
             {" "}
             {typeof app.icon === "string" ? (
@@ -1217,10 +1243,16 @@ const Taskbar = ({ openApps, onFocus, onLock, onPowerOff, onShowApps }) => {
           </button>
         ))}{" "}
       </div>{" "}
-      <div className="flex items-center gap-3 text-xs px-3 py-1 bg-black/20 rounded-lg">
+      <div className="hidden md:flex items-center gap-3 text-xs px-3 py-1 bg-black/20 rounded-lg">
         {" "}
         <Wifi className="w-4 h-4" /> <Volume2 className="w-4 h-4" />{" "}
         <Battery className="w-4 h-4" />{" "}
+        <span>
+          {time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+        </span>{" "}
+      </div>{" "}
+      <div className="text-xs font-semibold md:hidden">
+        {" "}
         <span>
           {time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
         </span>{" "}
@@ -1243,13 +1275,13 @@ const LockScreen = ({ onUnlock, theme }) => (
     {" "}
     <div className="bg-black/30 backdrop-blur-md p-8 rounded-2xl text-center">
       {" "}
-      <h1 className="text-7xl font-bold">
+      <h1 className="text-5xl md:text-7xl font-bold">
         {new Date().toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         })}
       </h1>{" "}
-      <p className="text-2xl">
+      <p className="text-xl md:text-2xl">
         {new Date().toLocaleDateString([], {
           weekday: "long",
           month: "long",
@@ -1266,7 +1298,7 @@ const AllAppsGrid = ({ onOpen, onClose }) => (
     onClick={onClose}
   >
     {" "}
-    <div className="p-8 grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] gap-8 max-w-4xl w-full">
+    <div className="p-8 grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-4 max-w-4xl w-full">
       {" "}
       {apps.map((app) => (
         <DesktopIcon key={app.id} app={app} onOpen={onOpen} />
@@ -1277,6 +1309,7 @@ const AllAppsGrid = ({ onOpen, onClose }) => (
 
 // Main App Component
 export default function App() {
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const [isBooting, setIsBooting] = useState(true);
   const [isLocked, setIsLocked] = useState(true);
   const [isPoweredOff, setIsPoweredOff] = useState(false);
@@ -1332,7 +1365,7 @@ export default function App() {
     theme === "light"
       ? "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200"
       : "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200";
-  if (isBooting) return <BootScreen onBooted={handleBoot} />;
+  if (isBooting && !isMobile) return <BootScreen onBooted={handleBoot} />;
   if (isPoweredOff) return <PowerOffScreen />;
 
   return (
@@ -1344,7 +1377,9 @@ export default function App() {
         style={{ backgroundImage: `url(${wallpaperUrl})` }}
       ></div>
       <div className="absolute inset-0 bg-black/10"></div>
-      {isLocked && <LockScreen onUnlock={handleUnlock} theme={theme} />}
+      {isLocked && !openApps.length && (
+        <LockScreen onUnlock={handleUnlock} theme={theme} />
+      )}
       <div className="relative z-10 h-full w-full">
         {showAllApps && (
           <AllAppsGrid
@@ -1352,11 +1387,14 @@ export default function App() {
             onClose={() => setShowAllApps(false)}
           />
         )}
-        <div className="p-4 h-full flex flex-col flex-wrap content-start gap-y-2">
-          {apps.map((app) => (
-            <DesktopIcon key={app.id} app={app} onOpen={openOrFocusApp} />
-          ))}
-        </div>
+        {!isMobile && (
+          <div className="p-4 h-full flex flex-col flex-wrap content-start gap-y-2">
+            {" "}
+            {apps.map((app) => (
+              <DesktopIcon key={app.id} app={app} onOpen={openOrFocusApp} />
+            ))}{" "}
+          </div>
+        )}
         {openApps.map((app) => (
           <Window
             key={app.id}
@@ -1367,6 +1405,7 @@ export default function App() {
             onFocus={openOrFocusApp}
             theme={theme}
             toggleTheme={toggleTheme}
+            isMobile={isMobile}
           />
         ))}
         <Taskbar
@@ -1375,6 +1414,7 @@ export default function App() {
           onLock={handleLock}
           onPowerOff={handlePowerOff}
           onShowApps={() => setShowAllApps(true)}
+          isMobile={isMobile}
         />
       </div>
     </div>
