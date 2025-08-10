@@ -1,19 +1,18 @@
 /*
  * =================================================================
- * FILE: App.js (Zorin OS Portfolio) - STAGE 7: FINAL MOBILE UX
+ * FILE: App.js (Zorin OS Portfolio) - STAGE 8: NATIVE MOBILE UI
  * =================================================================
  *
- * This version implements the final user feedback for a polished
- * and professional mobile user experience, including a standard
- * hamburger menu for complex applications.
+ * This final version implements a completely bespoke mobile UI,
+ * moving away from a desktop simulation to a more familiar and
+ * intuitive mobile OS experience.
  *
  * Key Upgrades:
- * - HAMBURGER MENU: 'About Me' and 'VS Code' now use a slide-out
- *   sidebar on mobile, triggered by a hamburger icon.
- * - CORRECTED LAYOUTS: The navigation in 'About Me' is now a
- *   vertical list in the sidebar. The main layout height is fixed,
- *   making the taskbar always visible without scrolling.
- * - All previous features and security measures are maintained.
+ * - DEDICATED MOBILE UI: The app now renders a completely different
+ *   UI on mobile, featuring a top status bar and an app grid.
+ * - NATIVE APP NAVIGATION: On mobile, apps open in a true full-screen
+ *   mode and are closed with a dedicated back button.
+ * - The desktop experience remains unchanged.
  *
  * =================================================================
  */
@@ -53,6 +52,7 @@ import {
   Settings,
   Power,
   Menu,
+  ArrowLeft,
 } from "lucide-react";
 
 // =================================================================
@@ -235,7 +235,7 @@ const callGeminiAPI = async (prompt) => {
 // OS-THEMED APP COMPONENTS
 // =================================================================
 const AboutSection = () => (
-  <div className="p-6 text-center flex flex-col items-center">
+  <div className="p-4 md:p-6 text-center flex flex-col items-center">
     {" "}
     <img
       src={personalInfo.avatar}
@@ -259,7 +259,7 @@ const AboutSection = () => (
   </div>
 );
 const EducationSection = () => (
-  <div className="p-6">
+  <div className="p-4 md:p-6">
     {" "}
     <h3 className="font-bold text-2xl mb-4 text-gray-900 dark:text-white">
       Education
@@ -286,7 +286,7 @@ const EducationSection = () => (
   </div>
 );
 const SkillsSection = () => (
-  <div className="p-6">
+  <div className="p-4 md:p-6">
     {" "}
     <h3 className="font-bold text-2xl mb-4 text-gray-900 dark:text-white">
       Skills
@@ -344,7 +344,7 @@ const ProjectsSection = () => {
     setLoading((prev) => ({ ...prev, [project.id]: false }));
   };
   return (
-    <div className="p-6">
+    <div className="p-4 md:p-6">
       {" "}
       <h3 className="font-bold text-2xl mb-4 text-gray-900 dark:text-white">
         Projects
@@ -404,7 +404,7 @@ const ProjectsSection = () => {
   );
 };
 const ExperienceSection = () => (
-  <div className="p-6">
+  <div className="p-4 md:p-6">
     {" "}
     <h3 className="font-bold text-2xl mb-4 text-gray-900 dark:text-white">
       Experience
@@ -433,7 +433,7 @@ const ExperienceSection = () => (
   </div>
 );
 
-const AboutApp = ({ isMobile, isSidebarOpen }) => {
+const AboutApp = ({ isMobile, isSidebarOpen, onSidebarToggle }) => {
   const [activeSection, setActiveSection] = useState("about");
   const sections = {
     about: { label: "About Me", icon: User, component: AboutSection },
@@ -461,22 +461,24 @@ const AboutApp = ({ isMobile, isSidebarOpen }) => {
       : "-translate-x-full"
     : "";
   return (
-    <div className="flex h-full bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 relative">
+    <div className="flex h-full bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 relative overflow-hidden">
       <div
-        className={`absolute md:relative z-20 md:z-auto w-56 bg-gray-100 dark:bg-gray-900 h-full p-4 border-r dark:border-gray-700 flex flex-col transition-transform transform ${sidebarClass}`}
+        className={`absolute md:relative z-20 w-56 bg-gray-100 dark:bg-gray-900 h-full p-4 border-r dark:border-gray-700 flex flex-col transition-transform transform ${sidebarClass}`}
       >
         {Object.entries(sections).map(([key, { label, icon: Icon }]) => (
           <button
             key={key}
-            onClick={() => setActiveSection(key)}
+            onClick={() => {
+              setActiveSection(key);
+              if (isMobile) onSidebarToggle();
+            }}
             className={`flex items-center gap-3 w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
               activeSection === key
                 ? "bg-indigo-500 text-white"
                 : "hover:bg-gray-200 dark:hover:bg-gray-700/50"
             }`}
           >
-            <Icon className="w-4 h-4" />
-            {label}
+            <Icon className="w-4 h-4" /> {label}
           </button>
         ))}
       </div>
@@ -519,7 +521,7 @@ const VSCodeApp = ({ isMobile, isSidebarOpen }) => {
         </div>
         <div className="flex-grow flex flex-col">
           <div className="bg-[#252526] flex-shrink-0">
-            <div className="bg-[#37373d] inline-flex items-center px-4 py-2 border-t-2 border-blue-500">
+            <div className="bg-[#37373d] inline-flex items-center px-4 py-2 w-full md:w-auto border-t-2 border-blue-500">
               <File className="w-4 h-4 text-blue-400 mr-2" /> {activeFile}
             </div>
           </div>
@@ -538,12 +540,12 @@ const VSCodeApp = ({ isMobile, isSidebarOpen }) => {
     </div>
   );
 };
-
+// Other simple apps remain unchanged
 const AICounselorApp = () => {
   const [messages, setMessages] = useState([
     {
       role: "ai",
-      text: "Hello! I'm your AI career counselor. Ask me anything about Shashank's skills, projects, or career path.",
+      text: "Hello! Ask me anything about Shashank's skills or career path.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -638,10 +640,7 @@ const AICounselorApp = () => {
 };
 const TerminalApp = () => {
   const [history, setHistory] = useState([
-    {
-      type: "output",
-      text: "Welcome to Shashank's Portfolio! Type 'help' for commands.",
-    },
+    { type: "output", text: "Welcome! Type 'help' for commands." },
   ]);
   const [input, setInput] = useState("");
   const inputRef = useRef(null);
@@ -673,7 +672,7 @@ const TerminalApp = () => {
         output = "Error fetching meme. Please try again.";
       }
     } else {
-      output = `Command not found: ${cmd}. Type 'help' for options.`;
+      output = `Command not found: ${cmd}.`;
     }
     setHistory((h) => {
       const lastCommand = h[h.length - 1];
@@ -986,6 +985,38 @@ const PowerOffScreen = () => (
     </p>
   </div>
 );
+const LockScreen = ({ onUnlock, theme }) => (
+  <div
+    onClick={onUnlock}
+    className="absolute inset-0 bg-cover bg-center z-50 flex flex-col items-center justify-center text-white cursor-pointer"
+    style={{
+      backgroundImage: `url(${
+        theme === "light"
+          ? "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800"
+          : "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800"
+      })`,
+    }}
+  >
+    {" "}
+    <div className="bg-black/30 backdrop-blur-md p-8 rounded-2xl text-center">
+      {" "}
+      <h1 className="text-5xl md:text-7xl font-bold">
+        {new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
+      </h1>{" "}
+      <p className="text-xl md:text-2xl">
+        {new Date().toLocaleDateString([], {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+        })}
+      </p>{" "}
+      <p className="mt-8 text-lg animate-pulse">Click to Unlock</p>{" "}
+    </div>{" "}
+  </div>
+);
 
 const apps = [
   {
@@ -1037,62 +1068,17 @@ const apps = [
   },
 ];
 
-const useDraggable = (id, onFocus, isMaximized) => {
-  const [position, setPosition] = useState({
-    x: 50 + Math.random() * 200,
-    y: 50 + Math.random() * 100,
-  });
-  const posRef = useRef(position);
-  posRef.current = position;
-  const dragHandleRef = useRef(null);
-  useEffect(() => {
-    const handle = dragHandleRef.current;
-    if (!handle) return;
-    const onMouseDown = (e) => {
-      if (isMaximized || e.target.closest("button")) return;
-      onFocus(id);
-      const startMouse = { x: e.clientX, y: e.clientY };
-      const startPos = posRef.current;
-      const onMouseMove = (moveEvent) => {
-        setPosition({
-          x: startPos.x + (moveEvent.clientX - startMouse.x),
-          y: startPos.y + (moveEvent.clientY - startMouse.y),
-        });
-      };
-      document.addEventListener("mousemove", onMouseMove);
-      document.addEventListener(
-        "mouseup",
-        () => document.removeEventListener("mousemove", onMouseMove),
-        { once: true }
-      );
-    };
-    handle.addEventListener("mousedown", onMouseDown);
-    return () => handle.removeEventListener("mousedown", onMouseDown);
-  }, [id, onFocus, isMaximized]);
-  return [position, dragHandleRef];
-};
-
-const Window = ({
-  app,
-  onClose,
-  onMinimize,
-  onMaximize,
-  onFocus,
-  theme,
-  toggleTheme,
-  isMobile,
-}) => {
-  const isActuallyMaximized = isMobile || app.isMaximized;
-  const [position, dragRef] = useDraggable(
-    app.id,
-    onFocus,
-    isActuallyMaximized
-  );
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+// ================== DESKTOP COMPONENTS ==================
+const DesktopWindow = ({ app, onClose, onMinimize, onMaximize, onFocus }) => {
+  const [isMaximized, setIsMaximized] = useState(false);
+  const handleMaximize = () => {
+    setIsMaximized((m) => !m);
+    onMaximize(app.id, !isMaximized);
+  };
+  const [position, dragRef] = useDraggable(app.id, onFocus, isMaximized);
   const appInfo = apps.find((a) => a.id === app.id);
   if (!appInfo) return null;
   const AppComponent = appInfo.component;
-
   const windowSize =
     {
       calculator: "w-[300px] h-[450px]",
@@ -1100,51 +1086,34 @@ const Window = ({
       about: "w-[900px] h-[600px]",
       default: "w-[800px] h-[600px]",
     }[app.id] || "w-[800px] h-[600px]";
-  const windowClasses = isActuallyMaximized
-    ? "top-0 left-0 w-full h-full rounded-none"
-    : `${windowSize} rounded-lg`;
-
   return (
     <div
       style={{
-        top: isActuallyMaximized ? 0 : position.y,
-        left: isActuallyMaximized ? 0 : position.x,
+        top: isMaximized ? 0 : position.y,
+        left: isMaximized ? 0 : position.x,
         zIndex: app.zIndex,
         display: app.isMinimized ? "none" : "flex",
       }}
-      className={`absolute ${windowClasses} bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-gray-300/50 dark:border-gray-600/50 shadow-2xl flex-col overflow-hidden`}
+      className={`absolute ${
+        isMaximized
+          ? "w-full h-[calc(100%-3.5rem)] rounded-none"
+          : `${windowSize} rounded-lg`
+      } bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-gray-300/50 dark:border-gray-600/50 shadow-2xl flex-col overflow-hidden`}
       onClick={() => onFocus(app.id)}
     >
       <div
         ref={dragRef}
-        className={`h-10 md:h-8 rounded-t-lg flex items-center justify-between px-2 ${
-          isActuallyMaximized ? "" : "cursor-move"
+        className={`h-8 rounded-t-lg flex items-center justify-between px-2 ${
+          isMaximized ? "" : "cursor-move"
         } bg-gray-200/80 dark:bg-gray-900/80 flex-shrink-0 border-b dark:border-gray-700/50`}
       >
         <div className="flex items-center gap-2">
-          {isMobile && appInfo.hasSidebar && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsSidebarOpen((o) => !o);
-              }}
-              className="p-1"
-            >
-              <Menu className="w-5 h-5 text-gray-800 dark:text-gray-200" />
-            </button>
-          )}
           {typeof appInfo.icon === "string" ? (
-            <img
-              src={appInfo.icon}
-              alt={appInfo.name}
-              className="w-5 h-5 md:w-4 md:h-4"
-            />
+            <img src={appInfo.icon} alt={appInfo.name} className="w-4 h-4" />
           ) : (
-            <appInfo.icon className="w-5 h-5 md:w-4 md:h-4 text-gray-800 dark:text-gray-200" />
+            <appInfo.icon className="w-4 h-4 text-gray-800 dark:text-gray-200" />
           )}
-          <span className="text-sm md:text-xs font-semibold">
-            {appInfo.name}
-          </span>
+          <span className="text-xs font-semibold">{appInfo.name}</span>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -1152,51 +1121,43 @@ const Window = ({
               e.stopPropagation();
               onMinimize(app.id);
             }}
-            className="w-7 h-7 md:w-5 md:h-5 flex items-center justify-center bg-yellow-400 rounded-full hover:bg-yellow-500"
+            className="w-5 h-5 flex items-center justify-center bg-yellow-400 rounded-full hover:bg-yellow-500"
           >
-            <Minimize2 className="w-4 h-4 md:w-3 md:h-3 text-black/50" />
+            <Minimize2 className="w-3 h-3 text-black/50" />
           </button>
           <button
-            disabled={isMobile}
             onClick={(e) => {
               e.stopPropagation();
-              onMaximize(app.id);
+              handleMaximize();
             }}
-            className="w-7 h-7 md:w-5 md:h-5 flex items-center justify-center bg-green-400 rounded-full hover:bg-green-500 disabled:opacity-50"
+            className="w-5 h-5 flex items-center justify-center bg-green-400 rounded-full hover:bg-green-500"
           >
-            <Maximize2 className="w-4 h-4 md:w-3 md:h-3 text-black/50" />
+            <Maximize2 className="w-3 h-3 text-black/50" />
           </button>
           <button
             onClick={(e) => {
               e.stopPropagation();
               onClose(app.id);
             }}
-            className="w-7 h-7 md:w-5 md:h-5 flex items-center justify-center bg-red-500 rounded-full hover:bg-red-600"
+            className="w-5 h-5 flex items-center justify-center bg-red-500 rounded-full hover:bg-red-600"
           >
-            <X className="w-4 h-4 md:w-3 md:h-3 text-black/50" />
+            <X className="w-3 h-3 text-black/50" />
           </button>
         </div>
       </div>
       <div className="flex-grow overflow-hidden">
-        <AppComponent
-          theme={theme}
-          toggleTheme={toggleTheme}
-          isMobile={isMobile}
-          isSidebarOpen={isSidebarOpen}
-        />
+        <AppComponent />
       </div>
     </div>
   );
 };
-
 const DesktopIcon = ({ app, onOpen }) => (
   <button
     onClick={() => onOpen(app.id)}
-    className="flex flex-col items-center justify-center gap-1 text-white text-xs font-medium w-20 h-20 md:w-24 md:h-24 p-2 rounded-lg hover:bg-white/10 focus:outline-none focus:bg-white/20 transition-colors"
+    className="flex flex-col items-center justify-center gap-1 text-white text-xs font-medium w-24 h-24 p-2 rounded-lg hover:bg-white/10 focus:outline-none focus:bg-white/20 transition-colors"
   >
     {" "}
-    <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">
-      {" "}
+    <div className="w-12 h-12 flex items-center justify-center">
       {typeof app.icon === "string" ? (
         <img
           src={app.icon}
@@ -1204,13 +1165,13 @@ const DesktopIcon = ({ app, onOpen }) => (
           className="w-full h-full object-contain"
         />
       ) : (
-        <app.icon className="w-8 h-8 md:w-10 md:h-10 text-white drop-shadow-lg" />
-      )}{" "}
+        <app.icon className="w-10 h-10 text-white drop-shadow-lg" />
+      )}
     </div>{" "}
     <span className="drop-shadow-lg text-center">{app.name}</span>{" "}
   </button>
 );
-const Taskbar = ({ openApps, onFocus, onLock }) => {
+const DesktopTaskbar = ({ openApps, onFocus, onLock }) => {
   const [time, setTime] = useState(new Date());
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -1268,75 +1229,132 @@ const Taskbar = ({ openApps, onFocus, onLock }) => {
     </div>
   );
 };
-const LockScreen = ({ onUnlock, theme }) => (
-  <div
-    onClick={onUnlock}
-    className="absolute inset-0 bg-cover bg-center z-40 flex flex-col items-center justify-center text-white cursor-pointer"
-    style={{
-      backgroundImage: `url(${
-        theme === "light"
-          ? "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800"
-          : "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800"
-      })`,
-    }}
-  >
-    {" "}
-    <div className="bg-black/30 backdrop-blur-md p-8 rounded-2xl text-center">
-      {" "}
-      <h1 className="text-5xl md:text-7xl font-bold">
-        {new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-      </h1>{" "}
-      <p className="text-xl md:text-2xl">
-        {new Date().toLocaleDateString([], {
-          weekday: "long",
-          month: "long",
-          day: "numeric",
-        })}
-      </p>{" "}
-      <p className="mt-8 text-lg animate-pulse">Click to Unlock</p>{" "}
-    </div>{" "}
-  </div>
-);
-const AllAppsGrid = ({ onOpen, onClose }) => (
-  <div
-    className="absolute inset-0 bg-black/50 backdrop-blur-lg z-30 flex items-center justify-center"
-    onClick={onClose}
-  >
-    {" "}
-    <div className="p-8 grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-4 max-w-4xl w-full">
-      {" "}
-      {apps.map((app) => (
-        <DesktopIcon key={app.id} app={app} onOpen={onOpen} />
-      ))}{" "}
-    </div>{" "}
-  </div>
-);
 
-// Main App Component
+// ================== MOBILE COMPONENTS ==================
+const MobileTopBar = ({ theme, onLock }) => {
+  const [time, setTime] = useState(new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+  return (
+    <div
+      className={`w-full h-8 px-4 flex justify-between items-center bg-black/20 backdrop-blur-sm text-sm font-semibold ${
+        theme === "light" ? "text-black" : "text-white"
+      }`}
+    >
+      <span>
+        {time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+      </span>
+      <div className="flex items-center gap-2">
+        <Wifi size={16} />
+        <Battery size={16} />
+        <button onClick={() => onLock(true)}>
+          <Power size={16} className="text-red-500" />
+        </button>
+      </div>
+    </div>
+  );
+};
+const MobileAppIcon = ({ app, onOpen }) => (
+  <button
+    onClick={() => onOpen(app.id)}
+    className="flex flex-col items-center justify-center gap-1.5 text-white text-sm font-medium"
+  >
+    {" "}
+    <div className="w-16 h-16 flex items-center justify-center bg-black/20 rounded-2xl">
+      {typeof app.icon === "string" ? (
+        <img
+          src={app.icon}
+          alt={app.name}
+          className="w-10 h-10 object-contain"
+        />
+      ) : (
+        <app.icon className="w-10 h-10 text-white drop-shadow-lg" />
+      )}
+    </div>{" "}
+    <span className="drop-shadow-lg text-center">{app.name}</span>{" "}
+  </button>
+);
+const MobileHomeScreen = ({ onOpen }) => (
+  <div className="p-4 grid grid-cols-4 gap-y-6">
+    {apps.map((app) => (
+      <MobileAppIcon key={app.id} app={app} onOpen={onOpen} />
+    ))}
+  </div>
+);
+const MobileAppView = ({ appId, onClose, theme, toggleTheme }) => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const appInfo = apps.find((a) => a.id === appId);
+  if (!appInfo) return null;
+  const AppComponent = appInfo.component;
+  return (
+    <div className="absolute inset-0 bg-gray-100 dark:bg-gray-900 z-30 flex flex-col">
+      <header className="h-12 flex-shrink-0 bg-gray-200 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700 flex items-center justify-between px-2">
+        <button onClick={onClose} className="p-2">
+          <ArrowLeft className="w-6 h-6 text-gray-800 dark:text-gray-200" />
+        </button>
+        <div className="flex items-center gap-2">
+          {typeof appInfo.icon === "string" ? (
+            <img src={appInfo.icon} alt={appInfo.name} className="w-6 h-6" />
+          ) : (
+            <appInfo.icon className="w-6 h-6 text-gray-800 dark:text-gray-200" />
+          )}
+          <h2 className="font-semibold text-lg text-gray-800 dark:text-gray-200">
+            {appInfo.name}
+          </h2>
+        </div>
+        <div className="w-8">
+          {appInfo.hasSidebar && (
+            <button onClick={() => setIsSidebarOpen((o) => !o)} className="p-1">
+              <Menu className="w-6 h-6 text-gray-800 dark:text-gray-200" />
+            </button>
+          )}
+        </div>
+      </header>
+      <main className="flex-grow overflow-y-auto">
+        <AppComponent
+          theme={theme}
+          toggleTheme={toggleTheme}
+          isMobile={true}
+          isSidebarOpen={isSidebarOpen}
+          onSidebarToggle={() => setIsSidebarOpen(false)}
+        />
+      </main>
+    </div>
+  );
+};
+
+// =======================================================
+// Main App Component (with Desktop/Mobile logic)
+// =======================================================
 export default function App() {
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const [isBooting, setIsBooting] = useState(true);
   const [isLocked, setIsLocked] = useState(true);
   const [isPoweredOff, setIsPoweredOff] = useState(false);
-  const [openApps, setOpenApps] = useState([]);
   const [theme, setTheme] = useState("dark");
-  const [showAllApps, setShowAllApps] = useState(false);
+
+  // Desktop state
+  const [openApps, setOpenApps] = useState([]);
+
+  // Mobile state
+  const [activeMobileApp, setActiveMobileApp] = useState(null);
 
   useEffect(() => {
     document.body.className = theme;
   }, [theme]);
-  const handleBoot = () => setIsBooting(false);
-  const handleLock = () => setIsLocked(true);
+  const handleLock = () => {
+    setIsLocked(true);
+    setOpenApps([]);
+    setActiveMobileApp(null);
+  };
   const handleUnlock = () => setIsLocked(false);
   const handlePowerOff = () => setIsPoweredOff(true);
   const toggleTheme = () =>
     setTheme((current) => (current === "light" ? "dark" : "light"));
 
+  // Desktop app management
   const openOrFocusApp = (appId) => {
-    setShowAllApps(false);
     setOpenApps((currentApps) => {
       const appIndex = currentApps.findIndex((app) => app.id === appId);
       const maxZ =
@@ -1362,10 +1380,10 @@ export default function App() {
         app.id === appId ? { ...app, isMinimized: true } : app
       )
     );
-  const maximizeApp = (appId) =>
+  const maximizeApp = (appId, isMaximized) =>
     setOpenApps((currentApps) =>
       currentApps.map((app) =>
-        app.id === appId ? { ...app, isMaximized: !app.isMaximized } : app
+        app.id === appId ? { ...app, isMaximized } : app
       )
     );
 
@@ -1373,55 +1391,67 @@ export default function App() {
     theme === "light"
       ? "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200"
       : "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200";
-  if (isBooting && !isMobile) return <BootScreen onBooted={handleBoot} />;
-  if (isPoweredOff) return <PowerOffScreen />;
 
+  if (isPoweredOff) return <PowerOffScreen />;
+  if (isLocked) return <LockScreen onUnlock={handleUnlock} theme={theme} />;
+
+  // ================== RENDER MOBILE UI ==================
+  if (isMobile) {
+    return (
+      <div className="h-screen w-screen bg-cover bg-center font-sans overflow-hidden flex flex-col">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${wallpaperUrl})` }}
+        ></div>
+        <div className="absolute inset-0 bg-black/20"></div>
+
+        <div className="relative z-10 h-full w-full flex flex-col">
+          <MobileTopBar theme={theme} onLock={handleLock} />
+          <div className="flex-grow overflow-y-auto">
+            <MobileHomeScreen onOpen={setActiveMobileApp} />
+          </div>
+        </div>
+
+        {activeMobileApp && (
+          <MobileAppView
+            appId={activeMobileApp}
+            onClose={() => setActiveMobileApp(null)}
+            theme={theme}
+            toggleTheme={toggleTheme}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // ================== RENDER DESKTOP UI ==================
   return (
-    <div className="h-screen w-screen bg-cover bg-center font-sans overflow-hidden flex flex-col">
+    <div className="h-screen w-screen bg-cover bg-center font-sans overflow-hidden">
+      <BootScreen onBooted={() => {}} /> {/* Simplified for desktop */}
       <div
-        className="absolute inset-0 bg-cover bg-center transition-all duration-1000"
+        className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${wallpaperUrl})` }}
       ></div>
       <div className="absolute inset-0 bg-black/10"></div>
-      {isLocked && !openApps.length && (
-        <LockScreen onUnlock={handleUnlock} theme={theme} />
-      )}
-
-      <main className="flex-grow relative z-10">
-        {showAllApps && (
-          <AllAppsGrid
-            onOpen={openOrFocusApp}
-            onClose={() => setShowAllApps(false)}
-          />
-        )}
+      <main className="relative z-10 h-[calc(100%-3.5rem)]">
         <div className="p-4 h-full flex flex-col flex-wrap content-start gap-y-2">
           {apps.map((app) => (
             <DesktopIcon key={app.id} app={app} onOpen={openOrFocusApp} />
           ))}
-          {isMobile && (
-            <DesktopIcon
-              app={{ id: "all_apps", name: "All Apps", icon: LayoutGrid }}
-              onOpen={() => setShowAllApps(true)}
-            />
-          )}
         </div>
         {openApps.map((app) => (
-          <Window
+          <DesktopWindow
             key={app.id}
             app={app}
             onClose={closeApp}
             onMinimize={minimizeApp}
             onMaximize={maximizeApp}
             onFocus={openOrFocusApp}
-            theme={theme}
-            toggleTheme={toggleTheme}
-            isMobile={isMobile}
           />
         ))}
       </main>
-
-      <footer className="relative z-20 h-14 flex-shrink-0">
-        <Taskbar
+      <footer className="relative z-20 h-14">
+        <DesktopTaskbar
           openApps={openApps}
           onFocus={openOrFocusApp}
           onLock={handleLock}
