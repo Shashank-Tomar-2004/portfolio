@@ -1,78 +1,71 @@
-# Getting Started with Create React App
+# Zorin OS - Interactive Portfolio
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Welcome to my interactive portfolio, designed to look and feel like the Zorin OS desktop environment. This project is more than just a list of my skills and experiences; it's a fully functional, web-based operating system that you can explore.
 
-## Available Scripts
+**[➡️ View the Live Demo Here](https://shashank-tomar.vercel.app/)** 
 
-In the project directory, you can run:
 
-### `npm start`
+ <img width="1366" height="639" alt="image" src="https://github.com/user-attachments/assets/8708cb5a-4258-49c1-aed7-8c207de32325" />
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
 
-### `npm test`
+## ✨ Core Features
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+This portfolio is built from the ground up to be a dynamic and engaging experience. Here are some of the key features you can interact with:
 
-### `npm run build`
+*   **A Familiar Desktop Experience:** Navigate a realistic OS environment with a desktop, taskbar, and application grid.
+*   **Window Management:** Open multiple applications at once. You can drag, resize, maximize, and minimize windows, just like in a real OS.
+*   **Working Applications:**
+    *   **About Me:** A comprehensive hub detailing my education, skills, professional experience, and achievements.
+    *   **VS Code:** A realistic mock-up of the Visual Studio Code editor, showcasing the project's own source code.
+    *   **Terminal:** An interactive terminal where you can run mock commands like `ls`, `help`, and even `meme` to fetch a random meme from the web.
+    *   **AI Counselor:** A chatbot powered by the **Google Gemini API** that can answer questions about my resume and career path.
+    *   **Project Analyzer:** Another Gemini-powered feature within the "About Me" app that can generate AI summaries of my projects.
+    *   **And more:** Functional Calculator, Spotify music player, and a Settings app to toggle between light and dark themes.
+*   **Secure API Integration:** All calls to the Gemini API are handled securely through a backend serverless function, ensuring that no secret keys are exposed on the frontend.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🚀 Tech Stack
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+This project was built using a modern and powerful set of technologies:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+*   **Frontend:** React.js
+*   **Styling:** Tailwind CSS
+*   **Icons:** Lucide React
+*   **Backend & API:** Vercel Serverless Functions (Node.js)
+*   **AI Services:** Google Gemini API
 
-### `npm run eject`
+## 🛠️ Setting Up the Project Locally
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+To get a local copy up and running, follow these simple steps.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Prerequisites
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+You will need to have `npm` (which comes with Node.js) and `git` installed on your machine.
 
 ### Installation
 
 1.  **Clone the repository:**
-
     ```
     git clone https://github.com/Shashank-Tomar-2004/portfolio.git
     ```
 
 2.  **Navigate to the project directory:**
-
     ```
     cd portfolio
     ```
 
 3.  **Install NPM packages:**
-
     ```
     npm install
     ```
 
 4.  **Set up your environment variables:**
     To use the AI features, you'll need to create a local environment file to store your Gemini API key.
-
-    - Create a new file in the root of the project named `.env.local`.
-    - Inside this file, add the following line, replacing `your_gemini_api_key` with your actual key from Google AI Studio:
-      ```
-      REACT_APP_GEMINI_API_KEY=your_gemini_api_key
-      ```
+    *   Create a new file in the root of the project named `.env.local`.
+    *   Inside this file, add the following line, replacing `your_gemini_api_key` with your actual key from Google AI Studio:
+        ```
+        REACT_APP_GEMINI_API_KEY=your_gemini_api_key
+        ```
 
 5.  **Start the development server:**
     ```
@@ -82,8 +75,11 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 ## 🚢 Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+This project is configured for easy deployment on **Vercel**.
 
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+1.  Push your code to your GitHub repository.
+2.  Import your repository into Vercel.
+3.  In the Vercel project settings, add the following environment variable:
+    *   **Name:** `GEMINI_API_KEY`
+    *   **Value:** `your_gemini_api_key` (The same key you used in your `.env.local` file)
+4.  Deploy! Vercel will automatically handle the rest, including the serverless function in the `api` directory.
