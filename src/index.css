@@ -1,3 +1,68 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", "SF Pro Display", "Inter", sans-serif;
+  background: #020617;
+}
+
+.shell-transition,
+.shell-transition * {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow, opacity, filter, transform;
+  transition-duration: 320ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.animate-float-1 {
+  animation: float-one 8s ease-in-out infinite;
+}
+
+.animate-float-2 {
+  animation: float-two 10s ease-in-out infinite;
+}
+
+.animate-float-3 {
+  animation: float-three 12s ease-in-out infinite;
+}
+
+@keyframes float-one {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(14px, -18px, 0);
+  }
+}
+
+@keyframes float-two {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-18px, 16px, 0);
+  }
+}
+
+@keyframes float-three {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(10px, 22px, 0);
+  }
+}
